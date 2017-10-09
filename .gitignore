@@ -7,9 +7,10 @@
 *.o
 *.so
 *.c
+*.html
 C/build/
 graphbispectrum/figures
-*.html
+graphbispectrum/timers
 
 # Packages
 *.egg
