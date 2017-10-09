@@ -1,7 +1,7 @@
 graphisomorphism
 ================
 
-Use bispectrum on symmetric group to solve graph isomorphism.
+Use bispectrum on symmetric group to solve (*cough*) graph isomorphism.
 
 
 ```python
