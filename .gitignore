@@ -1,0 +1,53 @@
+*.py[cod]
+
+# Emacs backups
+*~
+
+# C extensions
+*.o
+*.so
+*.c
+C/build/
+graphbispectrum/figures
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Waf artifacts
+.waf-*
+.lock-waf*
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# virtualenv
+env
+static
+.DS_Store
+.Python
+.build-done
