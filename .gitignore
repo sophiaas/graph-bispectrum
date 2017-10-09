@@ -9,6 +9,7 @@
 *.c
 C/build/
 graphbispectrum/figures
+*.html
 
 # Packages
 *.egg
