@@ -24,6 +24,7 @@ var
 sdist
 develop-eggs
 .installed.cfg
+.vscode
 lib
 lib64
 
@@ -53,3 +54,6 @@ static
 .DS_Store
 .Python
 .build-done
+
+# Network X
+g7

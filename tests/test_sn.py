@@ -281,10 +281,10 @@ class TestSymmetricGroup(object):
 
             assert_array_almost_equal(
                 R.dot(np.kron(l(g), m(g))),
-                s.direct_sum(l, m, g).dot(R))
+                s.direct_sum(l, m, g).dot(R), 4)
             assert_array_almost_equal(
                 R.dot(np.kron(l(h), m(h))),
-                s.direct_sum(l, m, h).dot(R))
+                s.direct_sum(l, m, h).dot(R), 4)
 
 
     def test_clebsch_gordan(self):
