@@ -13,6 +13,7 @@ virtualenv env
 . env/bin/activate
 pip install cython
 pip install -r requirements.txt
+python setup.py build_ext --inplace
 nosetests -s tests
 deactivate
 ```
