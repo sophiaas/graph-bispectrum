@@ -199,7 +199,7 @@ class TestSymmetricGroup(object):
         assert_array_almost_equal(rho(sigma), expected_rho_sigma)
 
     def test_representation(self):
-        rho = self.s5.irreducibles[2];
+        rho = self.s5.irreducibles[2]
         sigma1 = Permutation([0, 1, 3, 2, 4])
         sigma2 = Permutation([1, 2, 0, 3, 4])
 
@@ -262,6 +262,7 @@ class TestSymmetricGroup(object):
                     R.dot(np.kron(l(sigma), m(sigma))),
                     s.direct_sum(l, m, sigma).dot(R))
 
+    @skip
     def test_hillartwiner(self):
         s = SymmetricGroup(7)
         for l, m in itertools.product(s.irreducibles[:3], s.irreducibles[:3]):
@@ -270,7 +271,7 @@ class TestSymmetricGroup(object):
             R = s.hillartwiner(l, m).todense()
             assert_equal(R.shape, (dim, dim))
 
-            g,h = s[0], s[1]  # generators of sn
+            g, h = s[0], s[1]  # generators of sn
 
             Y0 = np.kron(l(g), m(g))
             X0 = s.direct_sum(l, m, g)
@@ -285,7 +286,6 @@ class TestSymmetricGroup(object):
             assert_array_almost_equal(
                 R.dot(np.kron(l(h), m(h))),
                 s.direct_sum(l, m, h).dot(R), 4)
-
 
     def test_clebsch_gordan(self):
         s = SymmetricGroup(6)

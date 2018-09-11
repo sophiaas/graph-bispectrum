@@ -127,22 +127,19 @@ class TestGraph(object):
                     bispectrum_ = Gdash.bispectrum(idx=(0, 1))
                     for b_i in xrange(len(bispectrum)):
                         assert_array_almost_equal(bispectrum[b_i], bispectrum_[b_i])
-    @skip
+
     def test_large_bispectrum(self):
-        # f1 = Graph.erdos_renyi(n=12)
-        # p = f1.sn.random()
-        # f1.fft()
-        # for m1, m2 in zip(f1.bispectrum(idx=idx), f2.bispectrum(idx=idx)):
-        #     assert_array_almost_equal(m1, m2)
+        f1 = Graph.erdos_renyi(n=6)
+        p = f1.sn.random()
+        f2 = f1.apply_permutation(p)
+        for m1, m2 in zip(f1.bispectrum(), f2.bispectrum()):
+            assert_array_almost_equal(m1.todense(), m2.todense())
 
-        iso_classes = self.calculate_invariant("bispectrum", n=7, idx=(0, 1, 2), sparse=True)
-        assert_equal(len(iso_classes), 1044)
-        
-
+    @skip
     def test_bispectrum(self):
         iso_classes = self.calculate_invariant("bispectrum", sparse=True)
         assert_equal(len(iso_classes), 11)
-        # iso_classes = self.calculate_invariant("bispectrum", n=5, idx=(0, 1))
-        # assert_equal(len(iso_classes), 34)
-        # iso_classes = self.calculate_invariant("bispectrum", n=6, idx=(0, 1, 2))
-        # assert_equal(len(iso_classes), 156)
+        iso_classes = self.calculate_invariant("bispectrum", n=5, idx=(0, 1))
+        assert_equal(len(iso_classes), 34)
+        iso_classes = self.calculate_invariant("bispectrum", n=6, idx=(0, 1, 2))
+        assert_equal(len(iso_classes), 156)
