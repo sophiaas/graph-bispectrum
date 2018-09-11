@@ -30,7 +30,7 @@ class TestGraph(object):
 
     def calculate_invariant(self, invariant_name, n=4, sparse=False, **kwargs):
         iso_classes = {}
-        tolerance=1.0
+        tolerance = 1.0
         e = int(round(n * (n - 1.0) / 2.0))
         for i in xrange(e + 1):
             logging.info("%d 1s in %d edges." % (i, e))
@@ -135,11 +135,15 @@ class TestGraph(object):
         for m1, m2 in zip(f1.bispectrum(), f2.bispectrum()):
             assert_array_almost_equal(m1.todense(), m2.todense())
 
-    @skip
-    def test_bispectrum(self):
+    def test_bispectrum_n4(self):
         iso_classes = self.calculate_invariant("bispectrum", sparse=True)
         assert_equal(len(iso_classes), 11)
-        iso_classes = self.calculate_invariant("bispectrum", n=5, idx=(0, 1))
+
+    def test_bispectrum_n5(self):
+        iso_classes = self.calculate_invariant("bispectrum", n=5, sparse=True, idx=(0, 1))
         assert_equal(len(iso_classes), 34)
-        iso_classes = self.calculate_invariant("bispectrum", n=6, idx=(0, 1, 2))
+
+    @skip
+    def test_bispectrum_n6(self):
+        iso_classes = self.calculate_invariant("bispectrum", n=6, sparse=True, idx=(0, 1, 2))
         assert_equal(len(iso_classes), 156)
