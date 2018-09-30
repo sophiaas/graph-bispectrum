@@ -1,0 +1,16 @@
+
+
+
+Matlab test code to try (Ian Stevenson):
+
+bispectrumcode/matlab/twodbispectrum/test.m
+
+For Least Squares Inversion:
+
+bispectrumcode/matlab/twodbispectrum/least_squares_inverse/bsp_recon_test.m
+
+
+Original version that includes inversion (from long, long ago CJH):
+
+bispectrumcode/matlab/twodbispectrum/original_cjh/2dbispectrumexample.m
+
