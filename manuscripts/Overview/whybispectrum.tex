@@ -74,10 +74,10 @@ Chronologically, the theory of groups was only formalized systematically after b
 \left[\begin{array}{cc}-1 & 0 \\0 & 1\end{array}\right],\left[\begin{array}{cc}0 & 1 \\1 & 0\end{array}\right],
 \left[\begin{array}{cc}1 & 0 \\0 & -1\end{array}\right],\left[\begin{array}{cc}0 & -1 \\-1 & 0\end{array}\right] \right\}.\]
 
-More generally, one can consider the collection of all finite groups.  Somewhat surprisingly, only recently has a complete classification of all such objects been carried out \cite{gorenstein2013finite}.  The main difficulty (an effort involving tens of thousands of research pages) was ruling out the existence of more ``sporatic" groups not on a known list (the largest having size $\sim 8 \cdot 10^{53}$).  Although finite groups can be very complex, there is nonetheless a ``master" class of groups containing them all.  These are the \textit{symmetric} groups $S_n$, also called \textit{permutation} groups.  Concretely, they are the set of \textit{bijections} $\pi$ from an $n$-element set $[n] := \{1, 2, \ldots, n\}$ to itself; i.e., those maps $\pi: [n] \to [n]$ that are both injective and surjective.  Multiplication $\cdot$ in this group is simply composition of maps $\tau \cdot \pi = \tau \circ \pi$.  The following fact explains why $S_n$ is a fundamental set of groups.
+More generally, one can consider the collection of all finite groups.  Somewhat surprisingly, only recently has a complete classification of all such objects been carried out \cite{gorenstein2013finite}.  The main difficulty (an effort involving thousands of research pages) was ruling out the existence of more ``sporatic" groups not on a known list (the largest, called the ``monster group", having size $\sim 8 \cdot 10^{53}$).  Although finite groups can be very complex, there is nonetheless a master class of groups containing them all.  These are the \textit{symmetric} groups $S_n$, also called \textit{permutation} groups.  Concretely, they are the set of \textit{bijections} $\pi$ from an $n$-element set $[n] := \{1, 2, \ldots, n\}$ to itself; i.e., those maps $\pi: [n] \to [n]$ that are both injective and surjective.  Multiplication $\cdot$ in this group is simply composition of maps $\tau \cdot \pi = \tau \circ \pi$.  The following fact explains why $S_n$ is a fundamental set of groups.
 
 \begin{theorem}[Cayley's Theorem]
-Every finite group is the subgroup of some permutation group $S_n$.  I.e., given any finite group $G$, there is a big enough integer $n$ such that $G$ is a subgroup of $S_n$.  
+Every finite group is the subgroup of some permutation group.  I.e., given any finite group $G$, there is a big enough integer $n$ such that $G$ is a subgroup of $S_n$.  
 \end{theorem}
 Another way of explaining Cayley's theorem is that all finite groups just eventually pop out of nowhere as subgroups of $S_n$ as $n$ increases.
 It turns out that $n = |G|$ (the size of $G$) is sufficient in this theorem. 
@@ -104,10 +104,8 @@ However, from the perspective of neuroscience and machine learning, it is often 
 \[ G\mathbf{x} := \{g\cdot \mathbf{x}: g \in G\} \subseteq X.\]
 In Figure \ref{bispetrum_intuition}, an example of this concept is the (red) collection of all rotations of a specific toy plane in 2D.
 
-
-
 This brings us to our main concern here: how to construct readily computable invariant features in a space? 
-The notion of ``group invariant" is quite old, but maybe most notably motivated by physics: invariants often come in the guise of ``conservation laws" (for instance, derived from Noether's theorem  \cite{noether1918invariante}).  Intuitively, these laws take the form $\forall g \,E(g \cdot x) = C$ for some function $E$ of the underlying coordinates and some constant $C$ independent of transformation $g \in G$.  For instance, the energy of a box should not change if it has only been rotated in space.
+The notion of ``group invariant" is quite old, but maybe most notably motivated by physics: invariants often come in the guise of ``conservation laws" (for instance, derived from Noether's theorem  \cite{noether1918invariante}).  Intuitively, these laws take the form $\forall g \,E(g \cdot \mathbf{x}) = C$ for some function $E$ of the underlying coordinates and some constant $C$ independent of transformation $g \in G$.  For instance, the energy of a box should not change if it has only been rotated in space.
 
 
 \subsection{Construction of bispectra}
@@ -132,8 +130,35 @@ Intuition for bispectra can be found in the illustration given in Figure \ref{bi
 
 \subsection{Bispectra for data science}
 
-The basic is here is that more complete sets of invariants should be useful.  For instance, consider the toy example of trying to recover a Calvin image from many translated, noisy measurements of him?  Averaging in original pixel space won't work and Fourier power is not strong enough to capture the original.  The solution is to ``average in bispectrum space and invert"; see Figure \ref{bispetrum_invert_calvin}.
+The basic idea here is that more complete sets of invariants should be useful.  For instance, consider the toy example of trying to recover a Calvin image from many translated, noisy measurements of him.  Averaging in original pixel space won't work and Fourier power is not strong enough to capture the original.  The solution is to ``average in bispectrum space and invert"; see Figure \ref{bispetrum_invert_calvin}.
 Compare with figures 3 and 4 from \cite{sadler89}.
+
+Another powerful perspective with which to view bispectral invariants is that they remove quantifiers in object classification tasks.  More specifically, consider the problem of finding the ``distance" between two points ``up to the group".  Naively, this involves an optimization of the form (so-called ``template matching"):
+\[ \min_{g, \,h \in G} || g \cdot \mathbf{x} - h\cdot \mathbf{y}||.\]
+On the other hand, with a bispectrum $\beta$ on call, a metric space comparison without the quantifier over the group becomes the simple expression:
+\[d(\mathbf{x}, \mathbf{y}) = || \beta(\mathbf{x}) - \beta(\mathbf{y})||.\]
+In many instances (when $\beta$ forms a complete set of invariants), this distance is zero if and only if $\mathbf{y}$ is a group translation of $\mathbf{x}$; that is, when there exists a $g \in G$ with $\mathbf{x} = g \cdot \mathbf{y}$.  In any case, however, $d$ is a distance between orbits and can be used with any classical machine learning method (nearest neighbor, SVMs, etc.) to extract invariant structure.
+
+Sometimes the savings by removing the ``$\min$" quantifier as above can be enormous.  Take, for instance, the problem of determining how close two weighted graphs are to each other up to ``relabelling" of the vertices (see Figure \ref{bispetrum_graphs}).  With the naive approach, a graph on $v$ vertices has up to $|S_v| = v!$ other graphs in its orbit.  Thus, the bispectrum approach has the potential to speed up computations by a factor of $v!$.
+
+\subsection{Bispectra for neuroscience}
+
+A very preliminary study of the correlation between neural responses in V1 took place in \cite{Mudigonda13}.
+
+
+
+%---------
+\section{General theory}
+\label{Sec:General}
+
+
+\section{Examples}
+
+\subsection{1D Bispectra}
+
+The bispectrum of a one dimensional signal is the Fourier transform of its triple correlation, and it is invariant under time translations.
+
+
 
 \begin{figure}
 \begin{center}
@@ -143,19 +168,16 @@ Compare with figures 3 and 4 from \cite{sadler89}.
 \end{center}
 \end{figure}
 
-\subsection{Bispectra for neuroscience}
 
-A very preliminary study of the correlation between neural responses in V1 took place in \cite{Mudigonda13}.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=.2 \linewidth]{figs/avg_bispec_real_cell25.pdf} 
-\includegraphics[width=.2 \linewidth]{figs/avg_bispec_real_cell30.pdf} 
-\caption{\textbf{Recovering invariant neuron responses}. For two cells, inverses of the spike-triggered bispectral averages.}
-\label{bispetrum_intuition2}
-\end{center}
-\end{figure}
-
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=.2 \linewidth]{figs/avg_bispec_real_cell25.pdf} 
+%\includegraphics[width=.2 \linewidth]{figs/avg_bispec_real_cell30.pdf} 
+%\caption{\textbf{Recovering invariant neuron responses}. For two cells, inverses of the spike-triggered bispectral averages.}
+%\label{bispetrum_intuition2}
+%\end{center}
+%\end{figure}
+% 
 
 
 \begin{figure}
@@ -170,21 +192,12 @@ A very preliminary study of the correlation between neural responses in V1 took 
 \begin{figure}
 \begin{center}
    \includegraphics[width=.9 \linewidth]{figs/bispect_examples_2.png} 
-\caption{\textbf{2D translationally invariant features}. In row \textbf{a}, we show 6 different images:  from left to right, we have a toy cat, a translated toy cat, a noisy cat, and the same for a toy truck.  For each image, we computed 16 complex-valued bispectrum features (\ref{eq:bispectrum}). The real parts \textbf{b} (imaginary parts \textbf{c}) of these features are depicted as a colormap with white representing the value 3000 and black, -2400.  Note the features are invariant to translations and retain salient structure even after corruption.}
+\caption{\textbf{2D translationally invariant features}. In row \textbf{a}, we show 6 different images:  from left to right, we have a toy cat, a translated toy cat, a noisy cat, and the same for a toy truck.  For each image, we computed 16 complex-valued bispectrum features. The real parts \textbf{b} (imaginary parts \textbf{c}) of these features are depicted as a colormap with white representing the value 3000 and black, -2400.  Note the features are invariant to translations and retain salient structure even after corruption.}
 \label{bispetrum_intuition2}
 \end{center}
 \end{figure}
 
-%---------
-\section{General theory}
-\label{Sec:General}
 
-
-\section{Examples}
-
-\subsection{1D Bispectra}
-
-The bispectrum of a one dimensional signal is the Fourier transform of its triple correlation, and it is invariant under time translations.
 
 \subsection{2D Bispectra}
 
