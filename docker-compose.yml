@@ -1,0 +1,7 @@
+graphisomorphism:
+  build: .
+  command: /bin/sh
+  stdin_open: true
+  tty: true
+  volumes:
+    - .:/code
