@@ -408,9 +408,9 @@ class CSymmetricGroup(PermutationGroup):
             return cls.groups[n]
 
         if n == 1:
-            G = super(SymmetricGroup, cls).__new__(cls, [Permutation([0])])
+            G = super(CSymmetricGroup, cls).__new__(cls, [Permutation([0])])
         elif n == 2:
-            G = super(SymmetricGroup, cls).__new__(cls, [Permutation([1, 0])])
+            G = super(CSymmetricGroup, cls).__new__(cls, [Permutation([1, 0])])
         else:
             a = range(1, n)
             a.append(0)
@@ -418,7 +418,7 @@ class CSymmetricGroup(PermutationGroup):
             a = range(n)
             a[0], a[1] = a[1], a[0]
             gen2 = Permutation._af_new(a)
-            G = super(SymmetricGroup, cls).__new__(cls, [gen1, gen2])
+            G = super(CSymmetricGroup, cls).__new__(cls, [gen1, gen2])
         if n < 3:
             G._is_abelian = True
             G._is_nilpotent = True
@@ -508,7 +508,7 @@ class CSymmetricGroup(PermutationGroup):
             G._register_irreducibles()
             return G
 
-        G.subgroup = SymmetricGroup(G.n - 1)
+        G.subgroup = CSymmetricGroup(G.n - 1)
         for i in xrange(len(G.subgroup.irreducibles)):
             lmbda = Partition(G.subgroup.irreducibles[i].partition)
             if len(lmbda) == 1 or lmbda[len(lmbda) - 1] < lmbda[len(lmbda) - 2]:
@@ -530,6 +530,9 @@ class CSymmetricGroup(PermutationGroup):
     def generate(self):
         for perm in xrange(self.order()):
             yield(self._generate(perm))
+
+    def irreducible(self, partition, index=True):
+        return self.irreducibles_by_partition.get(partition, (None, None))[0 if index else 1]
 
     @memoize_method
     def _generate(self, perm):

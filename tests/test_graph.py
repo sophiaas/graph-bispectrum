@@ -143,7 +143,10 @@ class TestGraph(object):
         iso_classes = self.calculate_invariant("bispectrum", n=5, sparse=True, idx=(0, 1))
         assert_equal(len(iso_classes), 34)
 
-    @skip
     def test_bispectrum_n6(self):
         iso_classes = self.calculate_invariant("bispectrum", n=6, sparse=True, idx=(0, 1, 2))
+        assert_equal(len(iso_classes), 156)
+
+    def test_bispectrum_n7(self):
+        iso_classes = self.calculate_invariant("bispectrum", n=7, sparse=True, idx=(0, 1, 2, 3))
         assert_equal(len(iso_classes), 156)

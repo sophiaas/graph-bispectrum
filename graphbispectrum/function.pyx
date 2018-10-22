@@ -94,8 +94,9 @@ class Function(object):
             fft = self.fft().matrix
         l = self.sn.irreducibles[l_index]
         m = self.sn.irreducibles[m_index]
-        return np.kron(fft[l_index], fft[m_index]).dot(
-            self.sn.clebsch_gordan(l, m).conjugate().T).dot(self.direct_sum(l, m).conjugate().T)
+        return np.kron(fft[l_index], fft[m_index]).astype(np.complex128).dot(
+            self.sn.clebsch_gordan(l, m).conjugate().T).dot(
+                self.direct_sum(l, m).conjugate().T.astype(np.complex128))
 
 
 class FourierTransform(object):

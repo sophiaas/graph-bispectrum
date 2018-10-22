@@ -148,5 +148,7 @@ class Graph(Function):
         # return super(Graph, self).bispectrum_element(l_index, m_index, fft)
         l = self.sn.irreducibles[l_index]
         m = self.sn.irreducibles[m_index]
-        return sparse.kron(fft[l_index], fft[m_index]).conjugate().T.dot(
-            self.sn.clebsch_gordan(l, m).conjugate().T).dot(self.direct_sum(l, m))
+        k = sparse.kron(fft[l_index], fft[m_index]).conjugate().T.astype(np.complex128)
+        cb = self.sn.clebsch_gordan(l, m).conjugate().T
+        ds = self.direct_sum(l, m).astype(np.complex128)
+        return k.dot(cb).dot(ds)

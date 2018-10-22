@@ -6,7 +6,7 @@ from Cython.Distutils import build_ext
 
 ext_modules = [
     Extension("graphbispectrum.simulortho", ["graphbispectrum/simulortho.pyx"]),
-    Extension("graphbispectrum.symmetric_group", ["graphbispectrum/symmetric_group.pyx"]),
+    Extension("graphbispectrum.csymmetric_group", ["graphbispectrum/csymmetric_group.pyx"]),
     Extension("graphbispectrum.function", ["graphbispectrum/function.pyx"]),
 ]
 
