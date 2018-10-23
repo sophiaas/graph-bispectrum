@@ -8,8 +8,9 @@ from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert
 from sympy.combinatorics.permutations import Permutation
 
 from graphbispectrum import Function, Graph, Partition, SymmetricGroup
+from graphbispectrum.util import kbits
 
-from utils import assert_permutation_equal, kbits, skip
+from utils import assert_permutation_equal, skip
 
 
 class TestGraph(object):
@@ -27,35 +28,6 @@ class TestGraph(object):
     def test_apply_permutation(self):
         f2 = self.f1.apply_permutation(self.sigma)
         assert_array_equal(f2.edges, [1, 1, 0])
-
-    def calculate_invariant(self, invariant_name, n=4, sparse=False, **kwargs):
-        iso_classes = {}
-        tolerance = 1.0
-        e = int(round(n * (n - 1.0) / 2.0))
-        for i in xrange(e + 1):
-            logging.info("%d 1s in %d edges." % (i, e))
-            for edges in kbits(e, i):
-                f = Graph.from_edges(edges)
-                invariant_value = getattr(f, invariant_name)(**kwargs)
-                if sparse:
-                    invariant_value = [inv.todense() for inv in invariant_value]
-
-                found = False
-                for key, (fdash, value) in iso_classes.iteritems():
-                    diff = np.sum([
-                        np.linalg.norm(v1 - v2) for v1, v2 in zip(invariant_value, value)
-                    ])
-                    if diff < tolerance:
-                        found = key
-                        break
-
-                if not found:
-                    key = unicode(invariant_value).encode("bz2")
-                    iso_classes[key] = ([(f, invariant_value)], invariant_value)
-                else:
-                    fdash.append((f, invariant_value))
-
-        return iso_classes
 
     def test_fft(self):
         f = Graph.from_edges([0, 1, 1])
@@ -140,13 +112,13 @@ class TestGraph(object):
         assert_equal(len(iso_classes), 11)
 
     def test_bispectrum_n5(self):
-        iso_classes = self.calculate_invariant("bispectrum", n=5, sparse=True, idx=(0, 1))
+        iso_classes = Graph.calculate_invariant("bispectrum", n=5, sparse=True, idx=(0, 1))
         assert_equal(len(iso_classes), 34)
 
     def test_bispectrum_n6(self):
-        iso_classes = self.calculate_invariant("bispectrum", n=6, sparse=True, idx=(0, 1, 2))
+        iso_classes = Graph.calculate_invariant("bispectrum", n=6, sparse=True, idx=(0, 1, 2))
         assert_equal(len(iso_classes), 156)
 
     def test_bispectrum_n7(self):
-        iso_classes = self.calculate_invariant("bispectrum", n=7, sparse=True, idx=(0, 1, 2, 3))
-        assert_equal(len(iso_classes), 156)
+        iso_classes = Graph.calculate_invariant("bispectrum", n=7, sparse=True, idx=(0, 1, 2, 3))
+        assert_equal(len(iso_classes), 1044)

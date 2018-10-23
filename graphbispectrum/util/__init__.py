@@ -56,6 +56,16 @@ def direct_sum(Ms):
     return result
 
 
+def kbits(n, k):
+    result = []
+    for bits in itertools.combinations(range(n), k):
+        s = [0] * n
+        for bit in bits:
+            s[bit] = 1
+        result.append(np.array(s))
+    return result
+
+
 def rank(A, atol=1e-13, rtol=0):
     """Estimate the rank (i.e. the dimension of the nullspace) of a matrix.
 

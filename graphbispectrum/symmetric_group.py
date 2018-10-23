@@ -41,7 +41,6 @@ class SymmetricGroup(CSymmetricGroup):
             for g in self.generate()))))
 
     def multiplicity(self, l, m):
-       #        return [(v.partition, self.Z(l, m, v)) for v in self.irreducibles]
         p1, p2 = l.partition, m.partition
         if (p1, p2) in self.Z_cache:
             return self.Z_cache[(p1, p2)]
@@ -51,6 +50,7 @@ class SymmetricGroup(CSymmetricGroup):
             return [(p2, 1)]
         if p2 == [self.n]:
             return [(p1, 1)]
+        return [(v.partition, self.Z(l, m, v)) for v in self.irreducibles]
 
     def direct_sum(self, l, m, g):
         Zv = self.multiplicity(l, m)
@@ -60,11 +60,10 @@ class SymmetricGroup(CSymmetricGroup):
     @memoize_method
     def clebsch_gordan(self, l, m):
         cg_filename = "C%d_%d_%d.mtx" % (self.n, l.index, m.index)
-        cg_cache = os.path.join(os.path.dirname(
-            __file__), "CG_cache", cg_filename)
-        # if os.path.exists(cg_cache):
-        #     logging.info(u"Loading clebsh-gordan for %s, %s from cache" % (l, m))
-        #     return mmread(cg_cache)
+        cg_cache = os.path.join(os.path.dirname(__file__), "CG_cache", cg_filename)
+        if os.path.exists(cg_cache):
+            logging.info(u"Loading clebsh-gordan for %s, %s from cache" % (l, m))
+            return mmread(cg_cache)
 
         logging.info(u"Computing clebsh-gordan for %s, %s" % (l, m))
         C = self.unitary_intertwiner(l, m)

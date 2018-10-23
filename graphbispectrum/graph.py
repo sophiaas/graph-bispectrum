@@ -1,4 +1,5 @@
 import itertools
+import logging
 import numpy as np
 
 from scipy import sparse
@@ -6,8 +7,11 @@ from sympy.combinatorics.permutations import Permutation
 
 from function import Function, FourierTransform
 from symmetric_group import Partition, SymmetricGroup
-from util import direct_sum, memoize_method
+from util import direct_sum, memoize_method, kbits
 from util.distributions import corrupt_binary_data
+
+
+logger = logging.getLogger("graphbispectrum.graph")
 
 
 class Graph(Function):
@@ -38,6 +42,44 @@ class Graph(Function):
             if i != j:
                 adjacency_matrix[i, j] = edges[cls.lex_index(i, j, V)]
         return cls(adjacency_matrix)
+
+    @classmethod
+    def calculate_invariant(cls, invariant_name, n=4, sparse=False, **kwargs):
+        iso_classes = {}
+        e = int(round(n * (n - 1.0) / 2.0))
+        num_graphs = 0
+        for i in xrange(e + 1):
+            print("%d 1s in %d edges." % (i, e))
+            iso_classes.update(cls.calculate_invariant_edges(
+                invariant_name, n, e, sparse, **kwargs))
+        return iso_classes
+
+    @classmethod
+    def calculate_invariant_edges(cls, invariant_name, n, i, sparse=False, **kwargs):
+        iso_classes = {}
+        tolerance = 1.0
+        e = int(round(n * (n - 1.0) / 2.0))
+        for edges in kbits(e, i):
+            f = Graph.from_edges(edges)
+            invariant_value = getattr(f, invariant_name)(**kwargs)
+            if sparse:
+                invariant_value = [inv.todense() for inv in invariant_value]
+
+            found = False
+            for key, value in iso_classes.iteritems():
+                diff = np.sum([
+                    np.linalg.norm(v1 - v2) for v1, v2 in zip(invariant_value, value)
+                ])
+                if diff < tolerance:
+                    found = key
+                    break
+
+            if not found:
+                key = unicode(invariant_value).encode("bz2")
+                iso_classes[key] = invariant_value
+                print len(iso_classes)
+
+        return iso_classes
 
     @property
     def edges(self):
