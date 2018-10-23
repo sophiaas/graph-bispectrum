@@ -77,7 +77,6 @@ class Graph(Function):
             if not found:
                 key = unicode(invariant_value).encode("bz2")
                 iso_classes[key] = invariant_value
-                print len(iso_classes)
 
         return iso_classes
 
