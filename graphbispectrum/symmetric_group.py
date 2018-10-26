@@ -176,9 +176,10 @@ class SymmetricGroup(CSymmetricGroup):
         null_M = sparse_nullspace(M)
 
         ncols = len(null_M)
-        randn_r = np.random.randn(null_M[0].shape[0])
-        randn_c = np.random.randn(null_M[0].shape[0])
-        randn = np.vectorize(complex)(randn_r, randn_c)
+        # randn_r = np.random.randn(null_M[0].shape[0])
+        # randn_c = np.random.randn(null_M[0].shape[0])
+        # randn = np.vectorize(complex)(randn_r, randn_c)
+        randn = np.random.randn(null_M[0].shape[0])
         R = sparse.lil_matrix((null_M[0].shape[0], 1), dtype=np.complex128)
         for i in xrange(ncols):
             # null_M[i] *= randn[i]
