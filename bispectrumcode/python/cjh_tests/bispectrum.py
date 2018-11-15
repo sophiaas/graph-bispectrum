@@ -282,12 +282,12 @@ def bispectrum_2d_fixed_objective(Fconcat, Bm, m, n):
     Fimag = Fconcat[Fconcat.shape[0] // 2:]
     return np.abs(bispectrum_2d((Freal + Fimag*1.j).reshape(1, m, n), m, n) - Bm).mean()
 
-def inv_2d_bispectrum(B, FFTs, m, n, factr=1, real=True):
-# Takes M truncated 2D Bispectra B = M x (m * n + 2)
+def inv_2d_bispectrum(Bm, FFTs, m, n, factr=1, real=True):
+# Takes mean of M 2D Bispectrua Bm = sum(M x (m * n + 2)) / M
 #    Takes M 2D FFTs = M x (m * n)
 #    returns least squares inverse
-    Bm = B.mean(axis=0)
-    M = B.shape[0]
+#     Bm = B.mean(axis=0)
+    M = FFTs.shape[0]
 
     F_opt = []
     min_opt = np.inf
@@ -306,5 +306,5 @@ def inv_2d_bispectrum(B, FFTs, m, n, factr=1, real=True):
             F = Freal + Fimag*1.j
 #            print(min_opt)
     if real:
-        return np.real(np.fft.ifft2(F.reshape(m, n)))
-    return np.fft.ifft2(F.reshape(m, n))
+        return np.real(np.fft.ifft2(F.reshape(m, n))), F_opt
+    return np.fft.ifft2(F.reshape(m, n)), F_opt

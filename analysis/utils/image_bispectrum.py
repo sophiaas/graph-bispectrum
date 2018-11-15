@@ -9,7 +9,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 from IPython.display import HTML
-from bispectrumcode.python.scrappystuff.bispectrum_tricky import *
+# from bispectrumcode.python.scrappystuff.bispectrum_tricky import *
+from analysis.utils.visualization import *
+from bispectrumcode.python.cjh_tests.bispectrum import *
 import sklearn.decomposition
 import cmath
 import os
@@ -22,7 +24,26 @@ import hypertools
 DATA WRANGLING
 """
 
+def clean_neurons(neurons):
+    """Tang data"""
+    cleaned = []
+    completed = []
+    for n in neurons:
+#         if np.max(n) >= 0.5:
+        completed_trials = np.zeros(n.shape[1])
+        n_completed = 0
+        for trial in n:
+            if np.mean(trial) > 1e-4 and np.sum(np.isnan(trial)) == 0:
+                completed_trials += trial
+                n_completed += 1
+        if n_completed > 0:
+            completed_trials /= n_completed
+            cleaned.append(completed_trials)
+            completed.append(n_completed)
+    return np.array(cleaned)
+
 def load_gallant(data_dir, num_frames=None, num_neurons=None, ds=True):
+    """Gallant data"""
     files = [f for f in os.listdir(data_dir) if isfile(join(data_dir, f)) and f[-3:]=='mat']
     spike_count = []
     stim = {}
@@ -71,7 +92,7 @@ def ravel_data(data):
 PLOTTING
 """
 
-def make_movie(vid):
+def make_movie(vid, interval=25, figsize=(5,5)):
     def init():
         return (im,)
     
@@ -79,11 +100,11 @@ def make_movie(vid):
         im.set_data(frame)
         return (im,)
     
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
     im = ax.imshow(np.zeros(vid[0].shape), vmin=np.min(vid), vmax=np.max(vid), cmap='Greys_r');
     plt.axis('off')
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=vid, interval=25, blit=True)
+                                   frames=vid, interval=interval, blit=True)
     plt.close()
     return HTML(anim.to_html5_video())    
 
@@ -129,14 +150,175 @@ def anim2d(spectrum, interval=25, line=True):
 
 def anim3d(spectrum, reduction=None):
     plt.rcParams["figure.figsize"] = (10,10)
-    h = hypertools.plot(spectrum, animate=True, frame_rate=10, reduce=reduction, ndims=3);
-    plt.close()
+    h = hypertools.plot(spectrum, animate=True, frame_rate=10, reduce=reduction, ndims=3, show=False);
     return HTML(h.line_ani.to_html5_video()) 
+
+def plot_neuron(neurons, stim, neuron_idx, stim_means=None, n_stds=3, img_cols=20, img_scale=1, white=True, crop=True):
+    mean_across_reps = neurons[neuron_idx]
+#     threshold = np.mean(mean_across_reps) + n_stds * np.std(mean_across_reps)
+    threshold = .5 * np.max(mean_across_reps)
+    print('threshold: {}'.format(threshold))
+    preferred_images = get_preferred_images(mean_across_reps, stim, threshold)
+    mean_bs_img, ffts = rev_corr(mean_across_reps, stim, stim_means, method='bispectrum', threshold=threshold, white=white)
+    mean_pixel_img = rev_corr(mean_across_reps, stim, stim_means, method='pixel', threshold=threshold, white=white)
+    r = plt.figure(figsize=(20, 1))
+    sns.heatmap(mean_across_reps[None, :], cmap="Greys")
+    h = plt.figure(figsize=(20, 4))
+    plt.hist(mean_across_reps, bins=200)
+    plt.axvline(x=threshold, color='red')
+    if crop:
+        plot_grid(preferred_images[:, 70:90, 70:90], scale=img_scale, cols=img_cols)
+    else:
+        plot_grid(preferred_images, scale=img_scale, cols=img_cols)
+    mean_bs_img[mean_bs_img < -40] = -10
+    mean_bs_img[mean_bs_img > 40] = -10
+    plot_grid(np.array([mean_bs_img, mean_pixel_img]), cols=1, scale=8)
+    return mean_bs_img, ffts
+    
+def plot_shapes_and_ns(shapes_neurons, shapes, ns_neurons, ns, neuron_idx, n_stds=3, crop_ns=False):
+    plot_neuron(shapes_neurons, shapes, neuron_idx, n_stds=n_stds, img_cols=20, img_scale=1, white=False, crop=True)
+    plot_neuron(ns_neurons, ns, neuron_idx, n_stds=n_stds, img_cols=8, img_scale=3, white=False, crop=crop_ns)
+    
+def load_imagenet(data_dir):
+    f = h5py.File(data_dir+'PicStimi2.mat','r')
+    stim = np.transpose(np.array(f['PicStimi2'], dtype=int), (0, 3, 2, 1))
+    crop_stim = np.zeros((stim.shape[0], 200, 200, stim.shape[3]))
+    stripe = np.zeros(stim.shape[1], dtype=int)
+    img = stim[500]
+    for x, img in enumerate(stim):
+        row_idx = []
+        col_idx = []
+        for i, row in enumerate(np.sum(img, axis=2)):
+            if (row == stripe).all():
+                row_idx.append(i)
+        for j, col in enumerate(np.sum(img, axis=2).T):
+            if (col == stripe).all():
+                col_idx.append(j)
+        c1 = np.delete(img, row_idx, axis=0)
+        c2 = np.delete(c1, col_idx, axis=1)
+        # Catching images that are (199, 199, 3)
+        if c2.shape != (200,200,3):
+            print(x)
+            c2 = np.append(c2, c2[-1][None, :, :], axis=0)
+        crop_stim[x] = c2
+    crop_stim = np.array(crop_stim, dtype=int)
+    return crop_stim
+
+def get_bispectrum(stim):
+    fts = []
+    bs = []
+    for img in stim:
+        f = np.fft.fftshift(np.fft.fft2(img))[None, :, :]
+        fts.append(f)
+        bs.append(bispectrum_2d(f, stim.shape[1], stim.shape[2]))
+    bs = np.array(bs)
+    return bs
 
 """
 ANALYSIS
 """
 
+def whiten(data):
+    data_mean = np.mean(data, axis=(1,2))
+    data -= data_mean[:, None, None]
+    dataFT = np.fft.fftshift(np.fft.fft2(data))
+    nyq = np.int32(np.floor(data.shape[1]/2))
+    freqs = np.linspace(-nyq, nyq-1, num=data.shape[1])
+    fspace = np.meshgrid(freqs, freqs)
+    rho = np.sqrt(np.square(fspace[0]) + np.square(fspace[1]))
+    lpf = np.exp(-0.5 * np.square(rho / (0.7 * nyq)))
+    w_filter = np.multiply(rho, lpf) # filter is in the frequency domain
+    dataFT = np.squeeze(np.multiply(dataFT, w_filter[None, :]))
+    data = np.squeeze(np.real(np.fft.ifft2(np.fft.ifftshift(dataFT))))
+    return data, data_mean
+
+def rgb_yuv(img, convert_to="yuv"):
+    shape = img.shape
+    converted_img = np.zeros((shape[2], shape[0] * shape[1]))
+    if convert_to == "yuv":
+        weights = np.array([[0.299, 0.587, 0.114],
+                            [-0.14713, -0.28886, 0.436],
+                            [0.615, -0.51488, -0.10001]])
+    elif convert_to == "rgb":
+        weights = np.array([[1, 0, 1.13983],
+                            [1, -0.39465, -0.58060],
+                            [1, 2.03211, 0]])
+    for i, x in enumerate(img.T):
+        converted_img[i] = x.ravel()
+    converted_img = np.matmul(weights, converted_img)
+    converted_img = np.reshape(converted_img.T, (shape[0], shape[1], shape[2]))
+    return converted_img
+
+def rev_corr(neuron, stim, stim_means, method='bispectrum', threshold=.5, white=True):
+    revcorr = []
+#     imgs = []
+    fts = []
+    responses = []
+    for i, response in enumerate(neuron):
+        if response > threshold:
+            if method == 'bispectrum' or method == 'power_spectrum':
+                imgFT = np.fft.fftshift(np.fft.fft2(stim[i]))[None, :, :]
+            if method == 'bispectrum':
+                fts.append(imgFT)
+                img = bispectrum_2d(imgFT, stim.shape[1], stim.shape[2])
+#                 imgs.append(bs)
+#                 img = bispectrum(imgFT, truncated=False)
+            elif method == 'power_spectrum':
+                img = imgFT * np.conj(imgFT)
+            else:
+                img = stim[i]
+            responses.append(response)
+            revcorr.append(img * response)
+#             revcorr += img * response
+    revcorr = np.sum(np.array(revcorr), axis=0) / np.sum(responses)
+    if method == 'bispectrum':
+#         revcorr = inv_bispectrum(revcorr, denoise=True)
+        revcorr, ffts = inv_2d_bispectrum(revcorr, np.array(fts), stim.shape[1], stim.shape[2])
+#         revcorr = np.real(np.fft.ifft2(np.fft.ifftshift(revcorr)))
+        return revcorr, ffts
+    else:
+        if method == "power_spectrum":
+            revcorr = np.real(np.fft.ifft2(np.fft.ifftshift(revcorr)))
+#     if white:
+#         revcorr = unwhiten(revcorr, stim_means)
+#     if len(revcorr.shape) >= 3:
+#         revcorr /= np.max(revcorr)
+        return revcorr
+
+def unwhiten(data, data_mean=None):
+    nyq = np.int32(np.floor(data.shape[0]/2))
+    freqs = np.linspace(-nyq, nyq-1, num=data.shape[0])
+    fspace = np.meshgrid(freqs, freqs)
+    rho = np.sqrt(np.square(fspace[0]) + np.square(fspace[1]))
+    invw_filter = np.zeros(rho.shape)
+    if len(data.shape) < 3:
+        data = data[None, :, :]
+    for i, a in enumerate(rho):
+        for j, b in enumerate(a):
+            invw_filter[i, j] = b ** -1 if b != 0 else 0
+    for i, img in enumerate(data):
+        unwhite = np.fft.fftshift(np.fft.fft2(img))
+        unwhite = np.multiply(unwhite, invw_filter)
+        unwhite = np.real(np.fft.ifft2(np.fft.ifftshift(unwhite)))
+        if data_mean is not None:
+            unwhite += data_mean[i].squeeze()
+        data[i] = unwhite.squeeze()
+    return data.squeeze()
+    
+def get_preferred_images(neuron, stim, threshold=.5):
+    idxs = []
+    responses = []
+    for i, response in enumerate(neuron):
+        if response > threshold:
+            idxs.append(i)
+            responses.append(response)
+    idxs = np.array(idxs)[np.argsort(responses)][::-1]
+    responses = np.array(responses)[np.argsort(responses)][::-1]
+    print('max_stim: {}   response: {}'.format(idxs[0], responses[0]))
+    return stim[idxs]
+
+
+    
 def PCA_reduction(data, n_components=100):
     means = data.mean(axis=(1))[:,None]
     data -= means
