@@ -11,7 +11,7 @@ def plot_bispectrum(orbits, orbit_index):
         bispectrum_ = compute_bispectrum(m)
         plot_grid(bispectrum_, "orbit " + str(orbit_index) + "-" + str(idx))
         
-def plot_grid(batch, title=None, scale=3, img=True, show_colorbar=False, cmap="Greys", cols=6):
+def plot_grid(batch, title=None, scale=3, img=True, show_colorbar=False, cmap="Greys_r", cols=6):
     N = len(batch)
     cols = cols
     rows = int(math.ceil(np.float(N) / cols))

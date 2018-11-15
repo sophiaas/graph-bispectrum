@@ -155,14 +155,15 @@ def anim3d(spectrum, reduction=None):
 
 def plot_neuron(neurons, stim, neuron_idx, stim_means=None, n_stds=3, img_cols=20, img_scale=1, white=True, crop=True):
     mean_across_reps = neurons[neuron_idx]
+    threshold = .5
 #     threshold = np.mean(mean_across_reps) + n_stds * np.std(mean_across_reps)
-    threshold = .5 * np.max(mean_across_reps)
+#     threshold = .5 * np.max(mean_across_reps)
     print('threshold: {}'.format(threshold))
     preferred_images = get_preferred_images(mean_across_reps, stim, threshold)
     mean_bs_img, ffts = rev_corr(mean_across_reps, stim, stim_means, method='bispectrum', threshold=threshold, white=white)
     mean_pixel_img = rev_corr(mean_across_reps, stim, stim_means, method='pixel', threshold=threshold, white=white)
     r = plt.figure(figsize=(20, 1))
-    sns.heatmap(mean_across_reps[None, :], cmap="Greys")
+    sns.heatmap(mean_across_reps[None, :], cmap="magma")
     h = plt.figure(figsize=(20, 4))
     plt.hist(mean_across_reps, bins=200)
     plt.axvline(x=threshold, color='red')
@@ -170,8 +171,8 @@ def plot_neuron(neurons, stim, neuron_idx, stim_means=None, n_stds=3, img_cols=2
         plot_grid(preferred_images[:, 70:90, 70:90], scale=img_scale, cols=img_cols)
     else:
         plot_grid(preferred_images, scale=img_scale, cols=img_cols)
-    mean_bs_img[mean_bs_img < -40] = -10
-    mean_bs_img[mean_bs_img > 40] = -10
+    mean_bs_img[mean_bs_img > 40] = 10
+    mean_bs_img[mean_bs_img < -40] = 10
     plot_grid(np.array([mean_bs_img, mean_pixel_img]), cols=2, scale=8)
     return mean_bs_img, ffts
     
@@ -266,6 +267,7 @@ def rev_corr(neuron, stim, stim_means, method='bispectrum', threshold=.5, white=
                 img = stim[i]
             responses.append(response)
             revcorr.append(img * response)
+    print(len(revcorr))
     revcorr = np.sum(np.array(revcorr), axis=0) / np.sum(responses)
     if method == 'bispectrum':
         revcorr, ffts = inv_2d_bispectrum(revcorr, np.array(fts), stim.shape[1], stim.shape[2])
