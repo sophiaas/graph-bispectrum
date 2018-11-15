@@ -172,7 +172,7 @@ def plot_neuron(neurons, stim, neuron_idx, stim_means=None, n_stds=3, img_cols=2
         plot_grid(preferred_images, scale=img_scale, cols=img_cols)
     mean_bs_img[mean_bs_img < -40] = -10
     mean_bs_img[mean_bs_img > 40] = -10
-    plot_grid(np.array([mean_bs_img, mean_pixel_img]), cols=1, scale=8)
+    plot_grid(np.array([mean_bs_img, mean_pixel_img]), cols=2, scale=8)
     return mean_bs_img, ffts
     
 def plot_shapes_and_ns(shapes_neurons, shapes, ns_neurons, ns, neuron_idx, n_stds=3, crop_ns=False):
@@ -249,9 +249,8 @@ def rgb_yuv(img, convert_to="yuv"):
     converted_img = np.reshape(converted_img.T, (shape[0], shape[1], shape[2]))
     return converted_img
 
-def rev_corr(neuron, stim, stim_means, method='bispectrum', threshold=.5, white=True):
+def rev_corr(neuron, stim, stim_means, method='bispectrum', threshold=.5, white=False):
     revcorr = []
-#     imgs = []
     fts = []
     responses = []
     for i, response in enumerate(neuron):
@@ -261,24 +260,17 @@ def rev_corr(neuron, stim, stim_means, method='bispectrum', threshold=.5, white=
             if method == 'bispectrum':
                 fts.append(imgFT)
                 img = bispectrum_2d(imgFT, stim.shape[1], stim.shape[2])
-#                 imgs.append(bs)
-#                 img = bispectrum(imgFT, truncated=False)
             elif method == 'power_spectrum':
                 img = imgFT * np.conj(imgFT)
             else:
                 img = stim[i]
             responses.append(response)
             revcorr.append(img * response)
-#             revcorr += img * response
     revcorr = np.sum(np.array(revcorr), axis=0) / np.sum(responses)
     if method == 'bispectrum':
-#         revcorr = inv_bispectrum(revcorr, denoise=True)
         revcorr, ffts = inv_2d_bispectrum(revcorr, np.array(fts), stim.shape[1], stim.shape[2])
-#         revcorr = np.real(np.fft.ifft2(np.fft.ifftshift(revcorr)))
         return revcorr, ffts
     else:
-        if method == "power_spectrum":
-            revcorr = np.real(np.fft.ifft2(np.fft.ifftshift(revcorr)))
 #     if white:
 #         revcorr = unwhiten(revcorr, stim_means)
 #     if len(revcorr.shape) >= 3:
