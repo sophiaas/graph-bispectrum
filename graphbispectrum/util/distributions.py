@@ -168,12 +168,12 @@ class FactoryTests(unittest.TestCase):
         sampler = self.factory.uniform_distribution_sampler(5, use_gpu=self.use_gpu)
         dataset = sampler.dataset
         if type(dataset) ==  ga.GPUArray: dataset = dataset.get()
-        for i in xrange(0, 100):
+        for i in range(0, 100):
             assert(sampler() in dataset)
 
     def test_sparse_bernoulli_distribution_sampler(self):
         sampler = self.factory.bernoulli_distribution_binary_sampler(10, sparsity=3, use_gpu=self.use_gpu)
-        for i in xrange(0, 100):
+        for i in range(0, 100):
             assert(sampler().sum() == 3)
 
     def test_corrupt_data(self):
@@ -185,5 +185,5 @@ class FactoryTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    print "Test for this file not implemeneted yet!"
+    print("Test for this file not implemeneted yet!")
 

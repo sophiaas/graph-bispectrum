@@ -30,7 +30,7 @@ class Partition(list):
 
     def restrictions(self):
         result = []
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             if i != len(self) - 1 and self[i] <= self[i + 1]:
                 continue
 
@@ -52,7 +52,7 @@ class StandardTableau(list):
     def from_partition(cls, partition):
         obj = StandardTableau()
         c = 1
-        for i in xrange(len(partition)):
+        for i in range(len(partition)):
             s = range(c, c + partition[i])
             c += partition[i]
             obj.append(s)
@@ -67,35 +67,35 @@ class StandardTableau(list):
     def __init__(self, *args):
         super(StandardTableau, self).__init__()
         for i, y in enumerate(args):
-            for j in xrange(len(self) + 1, y + 1):
+            for j in range(len(self) + 1, y + 1):
                 self.append([])
             self[y - 1].append(i + 1)
 
     def shape(self):
         result = Partition()
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             self.append(len(self[i]))
         return result;
 
     def grow_to(self, partition):
-      n = sum(partition)
-      for i in xrange(len(self)):
-          try:
-             p = partition[i]
-          except IndexError:
-             p = 0
+        n = sum(partition)
+        for i in range(len(self)):
+            try:
+                p = partition[i]
+            except IndexError:
+                p = 0
 
-          if len(self[i]) + 1 == p:
-              self[i].append(n)
-              return self
-      self.append([n])
-      return self
+            if len(self[i]) + 1 == p:
+                self[i].append(n)
+                return self
+        self.append([n])
+        return self
 
     def apply_transposition(self, t):
         ai = aj = -1
         i = 0
         while ai < 0 and i < len(self):
-            for j in xrange(len(self[i])):
+            for j in range(len(self[i])):
                 if self[i][j] == t:
                     ai = i
                     aj = j
@@ -106,7 +106,7 @@ class StandardTableau(list):
         bi = bj = -1
         i = 0
         while bi < 0 and i < len(self):
-            for j in xrange(len(self[i])):
+            for j in range(len(self[i])):
                 if self[i][j] == t + 1:
                     bi = i
                     bj = j
@@ -204,7 +204,7 @@ class SnIrreducible(object):
         if transposition_result:
             # find the index of Tdash...
 
-            for i in xrange(self.degree):
+            for i in range(self.degree):
                 if tdash == self.tableaus[i]:
                     return i, c1, (1 - pow(c1, 2)) ** 0.5, index
         # Case 2: result is just rescaling
@@ -218,8 +218,8 @@ class SnIrreducible(object):
         cdef coeff1 = np.zeros(self.degree * (self.n - 1), dtype=np.float)
         cdef coeff2 = np.zeros(self.degree * (self.n - 1), dtype=np.float)
 
-        for t in xrange(self.degree):
-            for j in xrange(1, self.n):
+        for t in range(self.degree):
+            for j in range(1, self.n):
                 td, c1, c2, index = self.young_orthogonal_coefficients(j, t)
                 tdash[index] = td
                 coeff1[index] = c1
@@ -240,16 +240,16 @@ class SnIrreducible(object):
         if m == -1:
             m = self.n
 
-        for p in xrange(m - 1, j - 1, -1):
+        for p in range(m - 1, j - 1, -1):
             tau = p
             if inverse:
                 tau = j + m - 1 - p
 
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 done[t] = 0
 
             # tabloid[T] goes to ...
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 if done[t]:
                     continue
 
@@ -258,7 +258,7 @@ class SnIrreducible(object):
                 if tdash == -1:
                     M[t, :] *= c1
                 else:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         temp = M[t, i]
                         M[t, i] = c1 * temp + c2 * M[tdash, i]
                         M[tdash, i] = -c1 * M[tdash, i] + c2 * temp
@@ -273,16 +273,16 @@ class SnIrreducible(object):
         if m == -1:
             m = self.n
 
-        for p in xrange(m - 1, j - 1, -1):
+        for p in range(m - 1, j - 1, -1):
             tau = p
             if inverse:
                 tau = j + m - 1 - p
 
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 done[t] = 0
 
             # tabloid[T] goes to ...
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 if done[t]:
                     continue
 
@@ -290,11 +290,11 @@ class SnIrreducible(object):
 
                 if tdash == -1:
                     M.resize(self.degree * self.degree)
-                    for i in xrange(t, t + self.degree * (self.degree - 1), self.degree):
+                    for i in range(t, t + self.degree * (self.degree - 1), self.degree):
                         M[i] = c1 * M[i]
                     M.resize((self.degree, self.degree))
                 else:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         temp = M[t, i]
                         M[t, i] = c1 * temp + c2 * M[tdash, i]
                         M[tdash, i] = -c1 * M[tdash, i] + c2 * temp
@@ -304,26 +304,26 @@ class SnIrreducible(object):
         cdef np.ndarray done = np.zeros(self.degree, dtype=np.int)
 
         taupre = j
-        for taupre in xrange(j, 2 * self.n - 2 - j + 1):
+        for taupre in range(j, 2 * self.n - 2 - j + 1):
             tau = taupre
 
             if tau > self.n - 1:
                 tau = (self.n - 1) - (tau - (self.n - 1))
 
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 done[t] = 0
 
             # tabloid[T] goes to ...
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 if done[t]:
                     continue
 
                 tdash, c1, c2, index = self.young_orthogonal_coefficients(tau, t)
                 if tdash == -1:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         M[t, i] = c1 * M[t, i];
                 else:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         temp = M[t, i]
                         M[t, i] = c1 * temp + c2 * M[tdash, i]
                         M[tdash, i] = -c1 * M[tdash, i] + c2 * temp
@@ -333,27 +333,27 @@ class SnIrreducible(object):
         cdef np.ndarray done = np.zeros(self.degree, dtype=np.int)
 
         taupre = j
-        for taupre in xrange(j, 2 * self.n - 2 - j + 1):
+        for taupre in range(j, 2 * self.n - 2 - j + 1):
             tau = taupre
 
             if tau > self.n - 1:
                 tau = (self.n - 1) - (tau - (self.n - 1))
 
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 done[t] = 0
 
             # tabloid[T] goes to ...
-            for t in xrange(self.degree):
+            for t in range(self.degree):
                 if done[t]:
                     continue
 
                 tdash, c1, c2, index = self.young_orthogonal_coefficients(tau, t)
                 if tdash == -1:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         M[t, i] = c1 * M[t, i];
                         i += self.degree
                 else:
-                    for i in xrange(self.degree):
+                    for i in range(self.degree):
                         temp = M[t, i]
                         M[t, i] = c1 * temp + c2 * M[tdash, i]
                         M[tdash, i] = -c1 * M[tdash, i] + c2 * temp
@@ -369,13 +369,13 @@ class SnIrreducible(object):
         cdef np.ndarray v = np.zeros(self.n, dtype=np.int)
         cdef np.ndarray M = np.identity(self.degree, dtype=DTYPE)
 
-        for i in xrange(self.n):
+        for i in range(self.n):
             v[i] = i + 1
 
-        for m in xrange(self.n, 0, -1):
+        for m in range(self.n, 0, -1):
             j = permutation(m - 1)
             self.apply_cycle_l(v[j], M, m, True)
-            for i in xrange(j + 2, self.n + 1):
+            for i in range(j + 2, self.n + 1):
                 v[i - 1] -= 1
 
         return M
@@ -412,10 +412,10 @@ class SymmetricGroup(PermutationGroup):
         elif n == 2:
             G = super(SymmetricGroup, cls).__new__(cls, [Permutation([1, 0])])
         else:
-            a = range(1, n)
+            a = list(range(1, n))
             a.append(0)
             gen1 = Permutation._af_new(a)
-            a = range(n)
+            a = list(range(n))
             a[0], a[1] = a[1], a[0]
             gen2 = Permutation._af_new(a)
             G = super(SymmetricGroup, cls).__new__(cls, [gen1, gen2])
@@ -509,7 +509,7 @@ class SymmetricGroup(PermutationGroup):
             return G
 
         G.subgroup = SymmetricGroup(G.n - 1)
-        for i in xrange(len(G.subgroup.irreducibles)):
+        for i in range(len(G.subgroup.irreducibles)):
             lmbda = Partition(G.subgroup.irreducibles[i].partition)
             if len(lmbda) == 1 or lmbda[len(lmbda) - 1] < lmbda[len(lmbda) - 2]:
                 lmbda[len(lmbda) - 1] += 1
@@ -528,19 +528,19 @@ class SymmetricGroup(PermutationGroup):
             self.irreducibles_by_partition[rho.partition] = (index, rho)
 
     def generate(self):
-        for perm in xrange(self.order()):
+        for perm in range(self.order()):
             yield(self._generate(perm))
 
     @memoize_method
     def _generate(self, perm):
         cdef np.ndarray v = np.zeros(self.n, dtype=np.int)
-        for i in xrange(self.n + 1):
+        for i in range(self.n + 1):
             v[i - 1] = i
         cdef int p = perm
         cdef int res = 0
         cdef int j = 0
         cdef int t = 0
-        for k in xrange(2, self.n + 1):
+        for k in range(2, self.n + 1):
             res = p % k
             p = (p - res) // k
             j = k - res
@@ -590,7 +590,7 @@ class SymmetricGroup(PermutationGroup):
     def direct_sum(self, l, m, g):
         Zv = self.multiplicity(l, m)
         return sparse.block_diag([
-            self.irreducible(v, index=False)(g) for v, z in Zv for zi in xrange(z)])
+            self.irreducible(v, index=False)(g) for v, z in Zv for zi in range(z)])
 
     @memoize_method
     def clebsch_gordan(self, l, m):
@@ -609,13 +609,13 @@ class SymmetricGroup(PermutationGroup):
         if n == 0:
             yield Permutation([], size=self.n)
         elif n == 1:
-            for i in xrange(self.n):
-                for j in xrange(i + 1, self.n):
+            for i in range(self.n):
+                for j in range(i + 1, self.n):
                     yield Permutation(i, j, size=self.n)
         elif n == 2:
-            for i in xrange(self.n):
-                for j in xrange(i + 1, self.n):
-                    for k in xrange(j + 1, self.n):
+            for i in range(self.n):
+                for j in range(i + 1, self.n):
+                    for k in range(j + 1, self.n):
                         yield Permutation(i, j, k, size=self.n)
                         yield Permutation(i, k, j, size=self.n)
         elif n == 3:
@@ -672,15 +672,15 @@ class SymmetricGroup(PermutationGroup):
                 v = self.irreducible(p, index=False)
                 degree = v.degree
                 M_tensor_I = Q[o:o + degree*zv, o:o + degree*zv]
-                mdim = M_tensor_I.shape[0] / degree
+                mdim = int(M_tensor_I.shape[0] / degree)
                 M = np.zeros((mdim, mdim))
-                for i in xrange(mdim):
-                    for j in xrange(mdim):
+                for i in range(mdim):
+                    for j in range(mdim):
                         M[i][j] = M_tensor_I[i * degree, j * degree]
 
                 Sv, d, _ = np.linalg.svd(M)
                 Sv = sparse.csc_matrix(Sv)
-                for i in xrange(len(d)):
+                for i in range(len(d)):
                      if abs(d[i]) > 0:
                          d[i] **= -0.5
 
@@ -688,8 +688,8 @@ class SymmetricGroup(PermutationGroup):
                 Id = sparse.identity(degree)
                 Rsub = R[o:o + degree * zv]
                 C_ = sparse.kron(D.dot(Sv.T), Id).dot(Rsub).tolil()
-                for i in xrange(C_.shape[0]):
-                    for j in xrange(C_.shape[1]):
+                for i in range(C_.shape[0]):
+                    for j in range(C_.shape[1]):
                         C[o + i, j] = C_[i, j]
                 o += degree * zv
         return C
@@ -714,7 +714,7 @@ class SymmetricGroup(PermutationGroup):
         ncols = len(null_M)
         randn = np.random.randn(null_M[0].shape[0])
         R = sparse.lil_matrix((null_M[0].shape[0], 1))
-        for i in xrange(ncols):
+        for i in range(ncols):
             null_M[i] *= randn[i]
             R += null_M[i]
         return R.reshape((d, d)).tocsc().T

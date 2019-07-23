@@ -27,21 +27,26 @@ class Graph(Function):
         if i < j:
             return i * V - i * (i + 1) // 2 + j - i - 1
         return cls.lex_index(j, i, V)
-
+    
     @classmethod
-    def from_edges(cls, edges):
+    def from_edges(cls, adjacency_matrix):
         """ Construct a graph from a list of edge weights. """
-        edges = np.array(edges)
-        V = int((1.0 +  (1.0 + 8 * edges.shape[0]) ** 0.5) / 2.0)
-        adjacency_matrix = np.zeros((V, V), dtype=edges.dtype)
-        for i, j in itertools.product(xrange(V), xrange(V)):
-            if i != j:
-                adjacency_matrix[i, j] = edges[cls.lex_index(i, j, V)]
         return cls(adjacency_matrix)
+
+#     @classmethod
+#     def from_edges(cls, edges):
+#         """ Construct a graph from a list of edge weights. """
+#         edges = np.array(edges)
+#         V = int((1.0 +  (1.0 + 8 * edges.shape[0]) ** 0.5) / 2.0)
+#         adjacency_matrix = np.zeros((V, V), dtype=edges.dtype)
+#         for i, j in itertools.product(range(V), range(V)):
+#             if i != j:
+#                 adjacency_matrix[i, j] = edges[cls.lex_index(i, j, V)]
+#         return cls(adjacency_matrix)
 
     @property
     def edges(self):
-        """ Constructs an edge vector from the adjancency matrix. """
+        """ Constructs an edge vector from the adjacency matrix. """
         return self.adj_matrix[np.triu_indices(self.sn.n, 1)]
 
     @property
@@ -54,7 +59,7 @@ class Graph(Function):
 
     @property
     def V(self):
-        """ Constructs an edge vector from the adjancency matrix. """
+        """ Constructs an edge vector from the adjacency matrix. """
         return self.adj_matrix.shape[0]
 
     def __init__(self, adj_matrix):
@@ -104,11 +109,11 @@ class Graph(Function):
             return sparse.csc_matrix((rho.degree, rho.degree))
 
         result = 0
-        for i, j in itertools.product(xrange(self.sn.n), xrange(self.sn.n)):
+        for i, j in itertools.product(range(self.sn.n), range(self.sn.n)):
             if i == j:
                 continue
 
-            isn = range(self.sn.n)
+            isn = list(range(self.sn.n))
             isn.remove(i)
             isn.remove(j)
             sigma = Permutation(isn + [i, j])
@@ -134,7 +139,7 @@ class Graph(Function):
         fft = self.fft().matrix
         return sparse.block_diag([
             fft[self.sn.irreducible(p, index=False).index] \
-            for p, z in self.sn.multiplicity(l, m) for zi in xrange(z)])
+            for p, z in self.sn.multiplicity(l, m) for zi in range(z)])
 
     def bispectrum(self, idx=None):
         if idx is None:

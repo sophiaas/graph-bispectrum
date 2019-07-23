@@ -28,13 +28,13 @@ class Function(object):
     def __getitem__(self, p):
         cdef int t = 0
         cdef int fact = self.sn.order()
-        cdef np.ndarray v = np.array(xrange(1, self.sn.n + 1), dtype=np.float)
+        cdef np.ndarray v = np.array(range(1, self.sn.n + 1), dtype=np.float)
         p_inv = ~p
-        for m in xrange(self.sn.n, 0, -1):
+        for m in range(self.sn.n, 0, -1):
             fact /= m
             j = p_inv(m - 1)
             t += (m - v[j]) * fact;
-            for i in xrange(j + 2, self.sn.n + 1):
+            for i in range(j + 2, self.sn.n + 1):
                 v[i - 1] -= 1
         return self.f[t]
 
@@ -70,14 +70,14 @@ class Function(object):
             F.matrix[rhoix] *= np.exp(alpha * beta)
 
         fdash = F.iFFT()
-        for i in xrange(self.sn.order()):
+        for i in range(self.sn.order()):
             # would be much faster without copy
             self.f[i] = fdash.f[i]
 
     def direct_sum(self, l, m):
         Zv = self.sn.multiplicity(l, m)
         fft = self.fft().matrix
-        return direct_sum([fft[self.sn.irreducible(p, index=False).index] for p, z in Zv for zi in xrange(z)])
+        return direct_sum([fft[self.sn.irreducible(p, index=False).index] for p, z in Zv for zi in range(z)])
 
     def power_spectrum(self):
         return np.array([m.conjugate().T.dot(m) for m in self.fft().matrix])
@@ -85,7 +85,7 @@ class Function(object):
     @memoize_method
     def bispectrum(self, idx=None):
         if idx is None:
-            idx = xrange(len(self.sn.irreducibles))
+            idx = range(len(self.sn.irreducibles))
         return [self.bispectrum_element(l_index, m_index) \
             for i, l_index in enumerate(idx) for m_index in idx]
 
@@ -128,17 +128,17 @@ class FourierTransform(object):
             return
 
         F = {}
-        for j in xrange(1, self.sn.n + 1):
+        for j in range(1, self.sn.n + 1):
             F[j - 1] = FourierTransform(self.sn.subgroup, [])
             F[j - 1].fft(f, offset + (self.sn.n - j) * suborder)
 
-        for i in xrange(len(self.sn.irreducibles)):
+        for i in range(len(self.sn.irreducibles)):
             rho = self.sn.irreducibles[i]
             M = np.zeros((rho.degree, rho.degree), dtype=np.float)
             # note: matrix is suposed to be empty when this function is called 
             self.matrix.append(M)
 
-            for j in xrange(1, self.sn.n + 1):
+            for j in range(1, self.sn.n + 1):
                 # Hack here
                 participants = [F[j - 1].matrix[eta_index] for eta_index in rho.eta_index]
                 tildef = np.zeros((rho.degree, rho.degree), dtype=np.float)
@@ -156,7 +156,7 @@ class FourierTransform(object):
         cdef int suborder = order / self.sn.n
 
         Fsub = FourierTransform(self.sn.subgroup)
-        for j in xrange(1, self.sn.n + 1):
+        for j in range(1, self.sn.n + 1):
             if j > 1:
                 for M in Fsub.matrix:
                     M *= 0
@@ -171,8 +171,8 @@ class FourierTransform(object):
 
                     degree = Msub.shape[0]
                     multiplier = (1.0 * rho.degree) / (1.0 * degree * self.sn.n)
-                    for a in xrange(degree):
-                        for b in xrange(degree):
+                    for a in range(degree):
+                        for b in range(degree):
                             Msub[a, b] += M[offset + a, offset + b] * multiplier
 
                     offset += degree
@@ -186,10 +186,10 @@ class FourierTransform(object):
         shape = t1.shape()
         for i, rho in enumerate(self.sn.irreducibles):
             if shape == rho.partition:
-                for j in xrange(rho.degree):
+                for j in range(rho.degree):
                     T1 = rho.tableau(j)
                     if t1 == T1:
-                        for k in xrange(rho.degree):
+                        for k in range(rho.degree):
                             T2 = rho.tableau(k)
                             if t2 == T2:
                                 M = self.matrix[i]
@@ -197,7 +197,7 @@ class FourierTransform(object):
 
     def norm2(self):
         result = 0.0
-        for i in xrange(len(self.matrix)):
+        for i in range(len(self.matrix)):
             result += 1
         return result
 

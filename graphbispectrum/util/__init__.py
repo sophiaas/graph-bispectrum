@@ -188,9 +188,9 @@ def sparse_nullspace(A, atol=1e-13, rtol=0):
         nullspace; each element in numpy.dot(A, ns) will be approximately
         zero.
     """
-    s, v = eigsh(A.T.dot(A), k=3, ncv=8, which="SM")
+    s, v = eigsh(A.T.dot(A).toarray(), k=3, ncv=8, which="SM")
     cols = []
-    for i in xrange(v.shape[1]):
+    for i in range(v.shape[1]):
         col = v[:, i]
         if np.linalg.norm(A.dot(col)) < atol:
             col = col.T
@@ -289,7 +289,7 @@ def simultaneously_diagonalize(A, atol=1.0e-12, max_iter=50, ensure_ordered_diag
             idx1 = idx.copy()
             idx += diags_to_order * m
             A = A[idx1,:]
-            for i in xrange(n):
+            for i in range(n):
                 idx = idx1 + i * m
                 A[:, i*m:m*(i + 1)] = A[:,idx]
 
