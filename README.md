@@ -1,4 +1,4 @@
-Graphisomorphism
+Graphbispectrum
 ================
 
 Use bispectrum on symmetric group to solve (*cough*) graph isomorphism.
@@ -7,8 +7,8 @@ Use bispectrum on symmetric group to solve (*cough*) graph isomorphism.
 ## Setup
 
 ```bash
-git clone git@github.com:rammie/graphisomorphism.git
-cd graphisomorphism
+git clone git@github.com:rammie/graphbispectrum.git
+cd graphbispectrum
 virtualenv env
 . env/bin/activate
 pip install cython
@@ -24,7 +24,7 @@ A `Dockerfile` and a `docker-compose.yml` are included in the root of the repo.
 
 ```bash
 docker-compose build
-docker-compose run graphisomorphism bash
+docker-compose run graphbispectrum bash
 ```
  
  This should give you an interactive shell inside the container.
