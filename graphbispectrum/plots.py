@@ -2,8 +2,8 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from graph import Graph
-from symmetric_group import SymmetricGroup, Partition
+from .graph import Graph
+from .symmetric_group import SymmetricGroup, Partition
 
 
 FIGURES = os.path.join(os.path.dirname(__file__), "figures")

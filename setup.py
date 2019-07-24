@@ -17,5 +17,6 @@ setup(
     description="",
     cmdclass={"build_ext": build_ext},
     include_dirs=[np.get_include()],
+    packages=["graphbispectrum"]
     ext_modules=ext_modules,
     zip_safe=False)

@@ -12,8 +12,8 @@ from sympy.combinatorics.perm_groups import PermutationGroup
 from sympy.combinatorics.permutations import Permutation
 from scipy.io import mmread, mmwrite
 
-from simulortho import simultaneously_orthogonalize
-from util import direct_sum, memoize_method, nullspace, sparse_nullspace
+from .simulortho import simultaneously_orthogonalize
+from .util import direct_sum, memoize_method, nullspace, sparse_nullspace
 
 cimport numpy as np
 DTYPE = np.float
