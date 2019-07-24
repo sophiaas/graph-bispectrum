@@ -4,10 +4,10 @@ import numpy as np
 from scipy import sparse
 from sympy.combinatorics.permutations import Permutation
 
-from .function import Function, FourierTransform
-from .symmetric_group import Partition, SymmetricGroup
-from .util import direct_sum, memoize_method
-from .util.distributions import corrupt_binary_data
+from function import Function, FourierTransform
+from symmetric_group import Partition, SymmetricGroup
+from util import direct_sum, memoize_method
+from util.distributions import corrupt_binary_data
 
 
 class Graph(Function):

@@ -4,7 +4,7 @@ import itertools
 import numpy as np
 import os
 
-from .util import direct_sum, memoize_method, nullspace
+from util import direct_sum, memoize_method, nullspace
 
 
 cimport numpy as np
