@@ -7,7 +7,7 @@ Use bispectrum on symmetric group to solve (*cough*) graph isomorphism.
 ## Setup
 
 ```bash
-git clone git@github.com:rammie/graphbispectrum.git
+git clone git@github.com:sophiaas/graphbispectrum.git
 cd graphbispectrum
 virtualenv env
 . env/bin/activate
