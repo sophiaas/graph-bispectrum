@@ -1,7 +1,7 @@
 Graphbispectrum
 ================
 
-Use bispectrum on symmetric group to solve (*cough*) graph isomorphism.
+Use the bispectrum on the symmetric group to solve graph isomorphism.
 
 
 ## Setup
