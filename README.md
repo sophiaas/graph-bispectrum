@@ -1,4 +1,4 @@
-Graphbispectrum
+Graph Bispectrum
 ================
 
 Use the bispectrum on the symmetric group to solve graph isomorphism.
